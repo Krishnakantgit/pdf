@@ -1,0 +1,15 @@
+streamlit
+transformers
+torch
+PyMuPDF
+pandas
+numpy
+pdfplumber
+Pillow
+requests
+sentencepiece
+pypdf
+faiss-cpu
+-qU langchain_community beautifulsoup4
+-qU langchain-groq
+huggingface_hub
