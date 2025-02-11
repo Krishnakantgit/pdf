@@ -3,33 +3,49 @@ name: Deploy to Hugging Face Spaces
 on:
   push:
     branches:
-      - main  # Runs when you push to the main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          lfs: true  # Enable Git LFS if needed
+          lfs: true  # Enables Git LFS
 
-      - name: Remove Large Files from History
+      - name: Install Git LFS
         run: |
-          git filter-branch --force --index-filter \
-          "git rm --cached --ignore-unmatch sample_data/mnist_test.csv sample_data/mnist_train_small.csv" \
-          --prune-empty --tag-name-filter cat -- --all || true
-          git reflog expire --expire=now --all || true
-          git gc --prune=now || true
+          sudo apt update
+          sudo apt install git-lfs
+          git lfs install
 
-      - name: Set Up Git
+      - name: Configure Git
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
+          git config --global user.email "your-email@example.com"
+          git config --global user.name "your-github-username"
 
-      - name: Force Push to Hugging Face Spaces
+      - name: Track Large Files with Git LFS
         run: |
-          git remote add hf https://$HF_TOKEN@huggingface.co/spaces/gamerclub/pdf-assistant
-          git push --force hf main
+          git lfs track "*.pkl" "*.keras"
+          git add .gitattributes
+          git commit -m "Track large files with Git LFS" || echo "No changes to commit"
+
+      - name: Add Hugging Face Remote
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git remote add hf https://user:${HF_TOKEN}@huggingface.co/spaces/gamerclub/pdf-assistant || echo "Remote already exists"
+
+      - name: Pull from Hugging Face to Resolve Conflicts
+        run: |
+          git fetch hf
+          git checkout main
+          git reset --soft hf/main  # Use Hugging Face's latest version
+          git add .
+          git commit -m "Resolve conflicts with Hugging Face main branch" || echo "No conflicts to resolve"
+
+      - name: Push to Hugging Face Spaces
+        run: |
+          git push hf main --force
