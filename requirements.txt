@@ -10,6 +10,8 @@ requests
 sentencepiece
 pypdf
 faiss-cpu
--qU langchain_community beautifulsoup4
--qU langchain-groq
+langchain_community
+beautifulsoup4
+langchain-groq
 huggingface_hub
+python-dotenv
