@@ -2,8 +2,8 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
-from langchain.llms import HuggingFacePipeline
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.llms import HuggingFacePipeline
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
