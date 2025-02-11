@@ -1,0 +1,35 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - main  # Runs when you push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true  # Enable Git LFS if needed
+
+      - name: Remove Large Files from History
+        run: |
+          git filter-branch --force --index-filter \
+          "git rm --cached --ignore-unmatch sample_data/mnist_test.csv sample_data/mnist_train_small.csv" \
+          --prune-empty --tag-name-filter cat -- --all || true
+          git reflog expire --expire=now --all || true
+          git gc --prune=now || true
+
+      - name: Set Up Git
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Force Push to Hugging Face Spaces
+        run: |
+          git remote add hf https://$HF_TOKEN@huggingface.co/spaces/gamerclub/pdf-assistant
+          git push --force hf main
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
