@@ -16,3 +16,4 @@ langchain-groq
 huggingface_hub
 python-dotenv
 sentence-transformers
+langchain-huggingface
